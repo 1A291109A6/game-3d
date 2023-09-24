@@ -3,45 +3,64 @@ const context = canvas.getContext('2d');
 
 //ゲーム設定
 const FPS = 30; //FPSを指定する
-const Speed = 1;
+const Speed = 6; //移動速度
+const rotation_speed = 1; //回転速度
+const g = 9.8; //重力加速度
+
+const rotationSpeed = rotation_speed * 2 * Math.PI / FPS;
 const moveSpeed = Speed / FPS;
 
 let angle = Math.PI / 2;
 let angle2 = canvas.width / (Math.tan(angle / 2) * 2);
 var player = [0, 0, 0, 0, 0];
 var point =[];
+var time = performance.now();
+var v_up = 0;
 
 document.addEventListener('keydown', (event) => {
   switch(event.key) {
     case 'ArrowLeft':
-      player[0] -= moveSpeed;
+      player[0] -= moveSpeed * Math.cos(player[3]);
+      player[2] += moveSpeed * Math.sin(player[3]);
       break;
     case 'ArrowRight':
-      player[0] += moveSpeed;
+      player[0] += moveSpeed * Math.cos(player[3]);
+      player[2] -= moveSpeed * Math.sin(player[3]);
       break;
     case 'ArrowUp':
-      player[2] += moveSpeed;
+      player[0] += moveSpeed * Math.sin(player[3]);
+      player[2] += moveSpeed * Math.cos(player[3]);
       break;
     case 'ArrowDown':
-      player[2] -= moveSpeed;
+      player[0] -= moveSpeed * Math.sin(player[3]);
+      player[2] -= moveSpeed * Math.cos(player[3]);
       break;
     case 'a':
-      player[3] -= moveSpeed;
+      player[3] -= rotationSpeed;
       break;
     case 'd':
-      player[3] += moveSpeed;
+      player[3] += rotationSpeed;
       break;
     case 's':
       player[4] -= moveSpeed;
+      if (player[4] < -Math.PI / 2) {
+        player[4] = -Math.PI / 2;
+      }
       break;
     case 'w':
       player[4] += moveSpeed;
+      if (player[4] > Math.PI / 2) {
+        player[4] = Math.PI / 2;
+      }
       break;
     case 'q':
       player[1] += moveSpeed;
       break;
     case 'e':
       player[1] -= moveSpeed;
+      break;
+    case ' ':
+      v_up = 5;
       break;
   }
 });
@@ -105,21 +124,45 @@ function draw_3Dcube(x, y, z, cx, cy, cz, rx, ry) {
   }
 }
 
+function c_movement() {
+  v_up -= g / FPS;
+  player[1] += v_up / FPS;
+  if (player[1] < 0) {
+    player[1] = 0;
+    v_up = 0;
+  }
+
+}
+
 function draw() {
   context.clearRect(0, 0, canvas.width, canvas.height);
-  draw_3Dcube(0, 0, 5, player[0], player[1], player[2], player[3], player[4])
+  if ((0 - player[0]) ^ 2 + (0 - player[1]) ^ 2 + (5 - player[2]) ^ 2 > 1) {
+    draw_3Dcube(0, 0, 5, player[0], player[1], player[2], player[3], player[4]);
+  }
+  if ((2 - player[0]) ^ 2 + (0 - player[1]) ^ 2 + (5 - player[2]) ^ 2 > 1) {
+    draw_3Dcube(2, 0, 5, player[0], player[1], player[2], player[3], player[4]);
+  }
+  if ((-2 - player[0]) ^ 2 + (0 - player[1]) ^ 2 + (10 - player[2]) ^ 2 > 1) {
+    draw_3Dcube(-2, 0, 10, player[0], player[1], player[2], player[3], player[4]);
+  }
+  if ((0 - player[0]) ^ 2 + (2 - player[1]) ^ 2 + (5 - player[2]) ^ 2 > 1) {
+    draw_3Dcube(0, 2, 5, player[0], player[1], player[2], player[3], player[4]);
+  }
 }
 
 function displayCoordinates() {
   context.fillStyle = 'black';
   context.font = '16px Arial';
-  context.fillText(`X: ${player[0]}, Y: ${player[1]}, Z: ${player[2]}, point(${point[4]},${point[5]})`, 10, 20);
+  context.fillText(`FPS: ${Math.floor(1000 / (performance.now() - time))}`, 10, 40);
+  context.fillText(`X: ${Math.floor(player[0] * 10) / 10}, Y: ${Math.floor(player[1] * 10) / 10}, Z: ${Math.floor(player[2] * 10) / 10}, point(${Math.floor(point[4] * 10) / 10},${Math.floor(point[0] * 10) / 10})`, 10, 20);
 }
 
 
 
 
 setInterval(() => {
+  c_movement();
   draw();
   displayCoordinates();
+  time = performance.now();
 }, 1000 / FPS);
