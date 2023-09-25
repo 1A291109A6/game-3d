@@ -10,12 +10,13 @@ const g = 9.8; //重力加速度
 const rotationSpeed = rotation_speed * 2 * Math.PI / FPS;
 const moveSpeed = Speed / FPS;
 
-let angle = Math.PI / 2;
+let angle = Math.PI / 2; //視野
 let angle2 = canvas.width / (Math.tan(angle / 2) * 2);
-var player = [0, 0, 0, 0, 0];
+var player = [0, 0, 0, 0, 0]; //プレイヤーの初期位置
 var point =[];
 var time = performance.now();
 var v_up = 0;
+var map =[]
 
 document.addEventListener('keydown', (event) => {
   switch(event.key) {
@@ -60,19 +61,19 @@ document.addEventListener('keydown', (event) => {
       player[1] -= moveSpeed;
       break;
     case ' ':
-      v_up = 5;
+      v_up = 4.95;
       break;
   }
 });
 
-function draw_plane(ax, ay, bx, by, cx, cy, dx, dy) {
+function draw_plane(ax, ay, bx, by, cx, cy, dx, dy, c) {
   context.beginPath();
   context.moveTo(canvas.width / 2 + ax, canvas.height / 2 - ay);
   context.lineTo(canvas.width / 2 + bx, canvas.height / 2 - by);
   context.lineTo(canvas.width / 2 + cx, canvas.height / 2 - cy);
   context.lineTo(canvas.width / 2 + dx, canvas.height / 2 - dy);
   context.closePath();
-  context.fillStyle = "blue";
+  context.fillStyle = c;
   context.fill();
 }
 
@@ -94,7 +95,7 @@ function convert_3Dto2D(x, y, z, cx, cy, cz, rx, ry) {
 }
 
 
-function draw_3Dcube(x, y, z, cx, cy, cz, rx, ry) {
+function draw_3Dcube(x, y, z, cx, cy, cz, rx, ry, c) {
   point =[];
   convert_3Dto2D(x, y, z, cx, cy, cz, rx, ry);
   convert_3Dto2D(x + 1, y, z, cx, cy, cz, rx, ry);
@@ -105,22 +106,22 @@ function draw_3Dcube(x, y, z, cx, cy, cz, rx, ry) {
   convert_3Dto2D(x, y - 1, z + 1, cx, cy, cz, rx, ry);
   convert_3Dto2D(x + 1, y - 1, z + 1, cx, cy, cz, rx, ry);
   if ((z - cz) > 0) {
-    draw_plane(point[0], point[1], point[2], point[3], point[6], point[7], point[4], point[5]);
+    draw_plane(point[0], point[1], point[2], point[3], point[6], point[7], point[4], point[5], c);
   }
   if ((x - cx) > 0) {
-    draw_plane(point[0], point[1], point[4], point[5], point[12], point[13], point[8], point[9]);
+    draw_plane(point[0], point[1], point[4], point[5], point[12], point[13], point[8], point[9], c);
   }
   if ((cx - x) > 1) {
-    draw_plane(point[2], point[3], point[6], point[7], point[14], point[15], point[10], point[11]);
+    draw_plane(point[2], point[3], point[6], point[7], point[14], point[15], point[10], point[11], c);
   }
   if ((cy - y) > 0) {
-    draw_plane(point[0], point[1], point[2], point[3], point[10], point[11], point[8], point[9]);
+    draw_plane(point[0], point[1], point[2], point[3], point[10], point[11], point[8], point[9], c);
   }
   if ((y - cy) > 1) {
-    draw_plane(point[4], point[5], point[6], point[7], point[14], point[15], point[12], point[13]);
+    draw_plane(point[4], point[5], point[6], point[7], point[14], point[15], point[12], point[13], c);
   }
   if ((cz - z) > 1) {
-    draw_plane(point[8], point[9], point[10], point[11], point[14], point[15], point[12], point[13]);
+    draw_plane(point[8], point[9], point[10], point[11], point[14], point[15], point[12], point[13], c);
   }
 }
 
@@ -135,18 +136,16 @@ function c_movement() {
 }
 
 function draw() {
-  context.clearRect(0, 0, canvas.width, canvas.height);
-  if ((0 - player[0]) ^ 2 + (0 - player[1]) ^ 2 + (5 - player[2]) ^ 2 > 1) {
-    draw_3Dcube(0, 0, 5, player[0], player[1], player[2], player[3], player[4]);
-  }
-  if ((2 - player[0]) ^ 2 + (0 - player[1]) ^ 2 + (5 - player[2]) ^ 2 > 1) {
-    draw_3Dcube(2, 0, 5, player[0], player[1], player[2], player[3], player[4]);
-  }
-  if ((-2 - player[0]) ^ 2 + (0 - player[1]) ^ 2 + (10 - player[2]) ^ 2 > 1) {
-    draw_3Dcube(-2, 0, 10, player[0], player[1], player[2], player[3], player[4]);
-  }
-  if ((0 - player[0]) ^ 2 + (2 - player[1]) ^ 2 + (5 - player[2]) ^ 2 > 1) {
-    draw_3Dcube(0, 2, 5, player[0], player[1], player[2], player[3], player[4]);
+  context.fillStyle = '#4169e1';
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  for (let i = 0; i <= 10; i++) {
+    for(let j = 0; j <= 10; j++) {
+      if ((i + j) % 2 == 0) {
+        draw_3Dcube(i, -1, j, player[0], player[1], player[2], player[3], player[4], '#228b22');
+      }else{
+        draw_3Dcube(i, -1, j, player[0], player[1], player[2], player[3], player[4], '#006400');
+      }
+    }
   }
 }
 
@@ -154,7 +153,7 @@ function displayCoordinates() {
   context.fillStyle = 'black';
   context.font = '16px Arial';
   context.fillText(`FPS: ${Math.floor(1000 / (performance.now() - time))}`, 10, 40);
-  context.fillText(`X: ${Math.floor(player[0] * 10) / 10}, Y: ${Math.floor(player[1] * 10) / 10}, Z: ${Math.floor(player[2] * 10) / 10}, point(${Math.floor(point[4] * 10) / 10},${Math.floor(point[0] * 10) / 10})`, 10, 20);
+  context.fillText(`player(${Math.floor(player[0] * 10) / 10},${Math.floor(player[1] * 10) / 10},${Math.floor(player[2] * 10) / 10})  point(${Math.floor(point[4] * 10) / 10},${Math.floor(point[0] * 10) / 10})`, 10, 20);
 }
 
 
