@@ -366,11 +366,11 @@ function draw() {
   context.fillStyle = '#4169e1';
   context.fillRect(0, 0, canvas.width, canvas.height);
   sort_block();
+  cosRx = Math.cos(player[3]);
+  cosRy = Math.cos(player[4]);
+  sinRx = Math.sin(player[3]);
+  sinRy = Math.sin(player[4]);
   for (let i = 0; i < sortedOrder.length; i++) {
-    cosRx = Math.cos(player[3]);
-    cosRy = Math.cos(player[4]);
-    sinRx = Math.sin(player[3]);
-    sinRy = Math.sin(player[4]);
     draw_3Dcube(sortedOrder[i] % num_block, Math.floor(sortedOrder[i] / num_block) % num_block, Math.floor(sortedOrder[i] / (num_block * num_block)), player[0], player[1], player[2], player[3], player[4], map[sortedOrder[i]]);
   }
 }
