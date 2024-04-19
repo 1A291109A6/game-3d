@@ -48,7 +48,7 @@ function generateRandomArray(num) {
 }
 
 //読み込む一辺の数
-var num_block = 5;
+var num_block = 20;
 var map = generateRandomArray(num_block);
 
 
