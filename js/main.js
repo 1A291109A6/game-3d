@@ -1,6 +1,10 @@
 const canvas = document.getElementById('Canvas');
 const context = canvas.getContext('2d');
 
+var cosRx = 0;
+var cosRy = 0;
+var sinRx = 0;
+var sinRx = 0;
 
 //canvasをウィンドウに合わせる
 canvas.width = window.innerWidth;
@@ -304,10 +308,10 @@ function convert_3Dto2D(x, y, z, cx, cy, cz, rx, ry) {
           point.push(null);
         }
       }else{
-        convert_3Dto2D(x, y * Math.cos(ry) - z * Math.sin(ry), y * Math.sin(ry) + z * Math.cos(ry), 0, 0, 0, 0, 0);
+        convert_3Dto2D(x, y * cosRy - z * sinRy, y * sinRy + z * cosRy, 0, 0, 0, 0, 0);
       }
     }else{
-      convert_3Dto2D(x * Math.cos(rx) - z * Math.sin(rx), y, x * Math.sin(rx) + z * Math.cos(rx), 0, 0, 0, 0, ry);
+      convert_3Dto2D(x * cosRx - z * sinRx, y, x * sinRx + z * cosRx, 0, 0, 0, 0, ry);
     }
   }else{
     convert_3Dto2D(x - cx, y - cy, z - cz, 0, 0, 0, rx, ry);
@@ -362,8 +366,12 @@ function draw() {
   context.fillStyle = '#4169e1';
   context.fillRect(0, 0, canvas.width, canvas.height);
   sort_block();
-  for (let i = 0; i < sortedOrder.length; i++) { 
-   draw_3Dcube(sortedOrder[i] % num_block, Math.floor(sortedOrder[i] / num_block) % num_block, Math.floor(sortedOrder[i] / (num_block * num_block)), player[0], player[1], player[2], player[3], player[4], map[sortedOrder[i]]);
+  for (let i = 0; i < sortedOrder.length; i++) {
+    cosRx = Math.cos(player[3]);
+    cosRy = Math.cos(player[4]);
+    sinRx = Math.sin(player[3]);
+    sinRy = Math.sin(player[4]);
+    draw_3Dcube(sortedOrder[i] % num_block, Math.floor(sortedOrder[i] / num_block) % num_block, Math.floor(sortedOrder[i] / (num_block * num_block)), player[0], player[1], player[2], player[3], player[4], map[sortedOrder[i]]);
   }
 }
 
